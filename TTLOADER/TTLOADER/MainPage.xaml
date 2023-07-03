@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TTLOADER.MainPage"
+            xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+            >
+
+    <ScrollView>
+        
+   
+    <StackLayout>
+        <Label Text="Ссылка на ТТ видео"></Label>
+        <Entry x:Name="UriEntry"/>
+        <Button x:Name="DownloadButton" Text="Загрузить" Clicked="DownloadButton_Clicked"></Button>
+            <WebView x:Name="UriWebView" Navigated="UriWebView_Navigated"/>
+            <CollectionView HeightRequest="500" x:Name="FlowView">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    
+                    <DataTemplate>
+                        <Image Source="{Binding }"  Aspect="AspectFit" HeightRequest="200" WidthRequest="100" ></Image>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        <StackLayout HorizontalOptions="Center" BackgroundColor="Transparent" Orientation="Horizontal">
+            <Button  x:Name="LoadImages" Clicked="LoadImages_Clicked" Text="Скачать картинки"/>
+            <Button x:Name="LoadMusic" Clicked="LoadMusic_Clicked" Text="Скачать музыку"/>
+        </StackLayout>
+            <StackLayout x:Name="ProgressPanel">
+                <ProgressBar  x:Name="DownloadBar"/>
+                <Label HorizontalOptions="Center" x:Name="DownloadResult"/>
+            </StackLayout>
+            
+    </StackLayout>
+    </ScrollView>
+
+</ContentPage>
