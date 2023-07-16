@@ -9,7 +9,11 @@
         
    
     <StackLayout>
-        <Label Text="Ссылка на ТТ видео"></Label>
+            <StackLayout Margin="5" Orientation="Vertical">
+                <Label HorizontalOptions="Center" FontSize="Large" Text="Загрузчик изображений из ТТ (BY Shatos)"/>
+                <Label FontSize="Medium" Text="Ссылка на ТТ видео"></Label>
+            </StackLayout>
+       
         <Entry x:Name="UriEntry"/>
         <Button x:Name="DownloadButton" Text="Загрузить" Clicked="DownloadButton_Clicked"></Button>
             <WebView x:Name="UriWebView" Navigated="UriWebView_Navigated"/>
@@ -20,21 +24,25 @@
                 <CollectionView.ItemTemplate>
                     
                     <DataTemplate>
-                        <Image Source="{Binding }"  Aspect="AspectFit" HeightRequest="200" WidthRequest="100" ></Image>
+                        <Grid>
+
+                            <Image Source="{Binding Uri}"  Aspect="AspectFit" HeightRequest="200" WidthRequest="100"  ></Image>
+                            <CheckBox VerticalOptions="Start" IsChecked="{Binding IsSelected}"></CheckBox>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
         <StackLayout HorizontalOptions="Center" BackgroundColor="Transparent" Orientation="Horizontal">
             <Button  x:Name="LoadImages" Clicked="LoadImages_Clicked" Text="Скачать картинки"/>
-            <Button x:Name="LoadMusic" Clicked="LoadMusic_Clicked" Text="Скачать музыку"/>
+            <Button x:Name="LoadMusic"  Text="Скачать музыку"/>
         </StackLayout>
             <StackLayout x:Name="ProgressPanel">
                 <ProgressBar  x:Name="DownloadBar"/>
                 <Label HorizontalOptions="Center" x:Name="DownloadResult"/>
             </StackLayout>
             
-    </StackLayout>
+        </StackLayout>
     </ScrollView>
 
 </ContentPage>

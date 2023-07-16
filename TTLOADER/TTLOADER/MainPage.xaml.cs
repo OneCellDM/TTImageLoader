@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
+using TTLOADER.Models;
 using Xamarin.Essentials;
 
 using Xamarin.Forms;
@@ -21,8 +21,8 @@ namespace TTLOADER
     {
         HttpClient _httpClient = new HttpClient();
        
-        (List<string> images, string audio) DownloadData;
-       
+      
+        List<ImageUIModel> Images{ get; set; } 
         int Downloaded = 0;
         int DownloadCount = 0;
        
@@ -82,7 +82,8 @@ namespace TTLOADER
                     var html = await GetHtml();
 
                     var data = DataParser.GetData(html);
-                    DownloadData = data;
+                    Images = data.images.Select(x => new ImageUIModel(x)).ToList();
+                   
                     if (string.IsNullOrEmpty(data.audio) is false)
                     {
                         LoadMusic.IsVisible = false;
@@ -90,7 +91,7 @@ namespace TTLOADER
                     if (data.images.Count() > 0)
                     {
                         LoadImages.IsVisible = true;
-                        FlowView.ItemsSource = data.images;
+                        FlowView.ItemsSource = Images;
                         //ImagesBytes = data.images.Select(img => _httpClient.GetByteArrayAsync(img).Result).ToList();
                     }
                 }
@@ -128,10 +129,19 @@ namespace TTLOADER
             Task.Run(async () =>
             {
 
+                var downloadImages = Images.Where(x=>x.IsSelected).ToList();
+                if (downloadImages.Count == 0){
+
+					Dispatcher.BeginInvokeOnMainThread(() =>
+					{
+                        DownloadResult.Text = "Выберите изображение";
+					});
+					return;
+                }
                 bool isErrors = false;
-                foreach (var image in DownloadData.images)
+                foreach (var image in downloadImages)
                 {
-                    MemoryStream memoryStream = new MemoryStream(await _httpClient.GetByteArrayAsync(image));
+                    MemoryStream memoryStream = new MemoryStream(await _httpClient.GetByteArrayAsync(image.Uri));
                     var res = await fileEngine.WriteFile(memoryStream, "Download",ext:".jpg");
                    
                     Debug.WriteLine("URI: "+image+" OK ");
@@ -152,28 +162,16 @@ namespace TTLOADER
            
         }
 
-        private void LoadMusic_Clicked(object sender, EventArgs e)
-        {
-            ClearProgressData();
-            FileEngine fileEngine = new FileEngine();
-            ProgressPanel.IsVisible = true;
-            Task.Run(async () =>
-            {
-                MemoryStream memoryStream = new MemoryStream(await _httpClient.GetByteArrayAsync(DownloadData.audio));
-               
-                bool res = await fileEngine.WriteFile(memoryStream, "Download",ext:".mp3");
-                
-                Dispatcher.BeginInvokeOnMainThread(() =>
-                {
-                    DownloadBar.Progress++;
-                    DownloadResult.Text = res == false ? "Загрузка файлов завершилась с ошибкой" : "Загрузка успешно завершена";
-                });
-            });
-        }
-
-     
-    }
-    public static class DataParser
+		private void FlowView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+            foreach(var item in e.CurrentSelection){
+				ImageUIModel model = item as ImageUIModel;
+				model.IsSelected = !model.IsSelected;
+			}
+			
+		}
+	}
+	public static class DataParser
     {
         public static (List<string> images, string audio) GetData(string html)
         {
